@@ -18,15 +18,6 @@ const SearchForm = () => {
     e.preventDefault();
 
     try {
-      if (offlineMode) {
-        const response = await axios.get(`http://localhost:8080/search`, {
-          params: { type, name,offlineMode },
-          withCredentials: true,  // Send cookies with the request
-        });
-        console.log("offline mode response",response);
-        setResult(response.data);
-        setError(null);
-      } else {
         // If not in offline mode, fetch data from the API
         const response = await axios.get(`http://localhost:8080/search`, {
           params: { type, name,offlineMode },
@@ -34,7 +25,7 @@ const SearchForm = () => {
         });
         setResult(response.data);
         setError(null);
-      }
+      
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Sorry, we couldn't find anything matching your search.");
