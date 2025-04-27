@@ -14,9 +14,13 @@ const SearchForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.get(`http://localhost:8080/search?type=${type}&name=${name}`);
+      const response = await axios.get(`http://localhost:8080/search`, {
+            params: { type, name },
+            withCredentials: true // Send cookies with the request
+        });
       setResult(response.data);
       setError(null);
+      console.log(response.data); // Handle response
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Sorry, we couldn't find anything matching your search.");
