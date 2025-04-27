@@ -14,10 +14,37 @@ const SearchForm = () => {
     setOfflineMode(!offlineMode);  // Toggle offline mode
   };
 
+  // Function to check and fetch cached data from localStorage
+  const getCachedData = (type, name) => {
+    const cachedData = localStorage.getItem(`${type}-${name}`);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+    return null;
+  };
+
+  // Function to store data in localStorage
+  const storeInLocalStorage = (type, name, data) => {
+    localStorage.setItem(`${type}-${name}`, JSON.stringify(data));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const cachedData = getCachedData(type, name);
+    if (offlineMode && cachedData) {
+      console.log("Caching in local storage")
+      setResult(cachedData);
+      setError(null);
+      return;
+    }
+    else if(!cachedData){
+      console.error("No data in cache");
+      setError("Sorry, we couldn't find anything matching your search in offline mode.");
+      setResult(null);
+    }
 
     try {
+      if(!offlineMode){
         // If not in offline mode, fetch data from the API
         const response = await axios.get(`http://localhost:8080/search`, {
           params: { type, name,offlineMode },
@@ -25,6 +52,8 @@ const SearchForm = () => {
         });
         setResult(response.data);
         setError(null);
+        storeInLocalStorage(type, name, response.data);
+      }
       
     } catch (error) {
       console.error("Error fetching data:", error);
