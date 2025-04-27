@@ -10,6 +10,8 @@ import com.example.starwars.star_wars.repository.InMemoryCache;
 
 
 
+/**This class is unused, but in case will have to put in cache if backend is up */
+
 @Service
 public class OfflineDataService {
 
