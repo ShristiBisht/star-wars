@@ -8,7 +8,7 @@ const SearchForm = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const types = ['planets', 'spaceships', 'vehicles', 'people', 'films', 'species'];
+  const types = ['planets', 'starships', 'vehicles', 'people', 'films', 'species'];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,8 +64,26 @@ const SearchForm = () => {
 
       {result && (
         <div className="result mt-4">
-          <h3>Results:</h3>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+          <pre>{result && (
+  <div className="result mt-4 p-4 border rounded shadow-sm">
+    <h3 className="mb-3 text-primary">Result</h3>
+    <div><strong>Type:</strong> {result.type}</div>
+    <div><strong>Name:</strong> {result.name}</div>
+    <div><strong>Count:</strong> {result.count}</div>
+    <div><strong>Films:</strong>
+      <ul className="list-disc ml-5">
+        {result.films && result.films.length > 0 ? (
+          result.films.map((film, index) => (
+            <li key={index}>{film}</li>
+          ))
+        ) : (
+          <li>No Films Available</li>
+        )}
+      </ul>
+    </div>
+  </div>
+)}
+</pre>
         </div>
       )}
 
