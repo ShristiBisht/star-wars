@@ -3,12 +3,12 @@ import axios from 'axios';
 
 
 const SearchForm = () => {
-  const [type, setType] = useState('Planets');
+  const [type, setType] = useState('planets');
   const [name, setName] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const types = ['Planets', 'Spaceships', 'Vehicles', 'People', 'Films', 'Species'];
+  const types = ['planets', 'spaceships', 'vehicles', 'people', 'films', 'species'];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
