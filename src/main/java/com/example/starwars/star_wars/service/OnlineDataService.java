@@ -31,7 +31,14 @@ public class OnlineDataService {
     private RestTemplate restTemplate;
     Logger logger = Logger.getLogger("OnlineDataService.class");
 
+    @Autowired
+    private OfflineDataService offlineDataService;
 
+
+    /** This is not a recommened approach
+     * For the previous task I alreadu had taken 2 days for API issues and for this api the SSL certificate was expired
+     * Therefore resorted to this approach
+     */
     private static void disableSslVerification() throws Exception {
         // Create a TrustManager that trusts all certificates
         TrustManager[] trustAllCertificates = new TrustManager[]{
@@ -111,6 +118,11 @@ public class OnlineDataService {
                     // Create a SearchResult object
                     SearchResult result = new SearchResult(type, nameField,count, films); // Only map first film URL
                     result.setCount(count);
+
+                    // Update the cache with new data
+                    logger.info("Updating cache");
+                    offlineDataService.updateData(type, name, result);  // Update cache in OfflineDataService
+
 
                     return result;
                 }

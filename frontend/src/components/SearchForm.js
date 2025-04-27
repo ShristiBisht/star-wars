@@ -1,26 +1,40 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-
 const SearchForm = () => {
   const [type, setType] = useState('planets');
   const [name, setName] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [offlineMode, setOfflineMode] = useState(false);  // Add offlineMode state
 
   const types = ['planets', 'starships', 'vehicles', 'people', 'films', 'species'];
+
+  const toggleOfflineMode = () => {
+    setOfflineMode(!offlineMode);  // Toggle offline mode
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.get(`http://localhost:8080/search`, {
-            params: { type, name },
-            withCredentials: true // Send cookies with the request
+      if (offlineMode) {
+        const response = await axios.get(`http://localhost:8080/search`, {
+          params: { type, name,offlineMode },
+          withCredentials: true,  // Send cookies with the request
         });
-      setResult(response.data);
-      setError(null);
-      console.log(response.data); // Handle response
+        console.log("offline mode response",response);
+        setResult(response.data);
+        setError(null);
+      } else {
+        // If not in offline mode, fetch data from the API
+        const response = await axios.get(`http://localhost:8080/search`, {
+          params: { type, name,offlineMode },
+          withCredentials: true,  // Send cookies with the request
+        });
+        setResult(response.data);
+        setError(null);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Sorry, we couldn't find anything matching your search.");
@@ -62,31 +76,35 @@ const SearchForm = () => {
         <button type="submit" className="btn btn-primary">Search</button>
       </form>
 
+      {/* Toggle for Offline Mode */}
+      <div className="offline-toggle mt-4">
+        <button onClick={toggleOfflineMode} className="btn btn-secondary">
+          {offlineMode ? "Switch to Online Mode" : "Switch to Offline Mode"}
+        </button>
+      </div>
+
+      {/* Display result */}
       {result && (
-        <div className="result mt-4">
-          <pre>{result && (
-  <div className="result mt-4 p-4 border rounded shadow-sm">
-    <h3 className="mb-3 text-primary">Result</h3>
-    <div><strong>Type:</strong> {result.type}</div>
-    <div><strong>Name:</strong> {result.name}</div>
-    <div><strong>Count:</strong> {result.count}</div>
-    <div><strong>Films:</strong>
-      <ul className="list-disc ml-5">
-        {result.films && result.films.length > 0 ? (
-          result.films.map((film, index) => (
-            <li key={index}>{film}</li>
-          ))
-        ) : (
-          <li>No Films Available</li>
-        )}
-      </ul>
-    </div>
-  </div>
-)}
-</pre>
+        <div className="result mt-4 p-4 border rounded shadow-sm">
+          <h3 className="mb-3 text-primary">Result</h3>
+          <div><strong>Type:</strong> {result.type}</div>
+          <div><strong>Name:</strong> {result.name}</div>
+          <div><strong>Count:</strong> {result.count}</div>
+          <div><strong>Films:</strong>
+            <ul className="list-disc ml-5">
+              {result.films && result.films.length > 0 ? (
+                result.films.map((film, index) => (
+                  <li key={index}>{film}</li>
+                ))
+              ) : (
+                <li>No Films Available</li>
+              )}
+            </ul>
+          </div>
         </div>
       )}
 
+      {/* Display error message */}
       {error && <p className="error mt-4">{error}</p>}
     </div>
   );
