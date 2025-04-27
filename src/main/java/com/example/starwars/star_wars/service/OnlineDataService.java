@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -74,7 +75,8 @@ public class OnlineDataService {
     public SearchResult fetchData(String type, String name) {
         try {
             // // Construct the URL with parameters
-            String httpsUrl = "https://swapi.dev/api/"+type+"/?search="+name+"&format=json";
+            String encodedName = URLEncoder.encode(name, "UTF-8");
+            String httpsUrl = "https://swapi.dev/api/"+type+"/?search="+encodedName+"&format=json";
             logger.info("Service Class URL : "+ httpsUrl);
             disableSslVerification();
             URL url = new URL(httpsUrl);
@@ -105,10 +107,20 @@ public class OnlineDataService {
                 if (resultsNode.isArray() && resultsNode.size() > 0) {
                     JsonNode starshipNode = resultsNode.get(0);  // Assuming we are only interested in the first result
                     String nameField = starshipNode.path("name").asText();
-                    List<String> films = List.of(starshipNode.path("films").get(0).asText());  // Assuming the first film URL
+                    // List<String> films = List.of(starshipNode.path("films").get(0).asText());  // Assuming the first film URL
+                    List<String> films = extractFilms(starshipNode);
+                     if (films != null && !films.isEmpty()) {
+                        List<String> resolvedFilms = new ArrayList<>();
+                        for (String filmUrl : films) {
+                            logger.info("Single Film URL is "+filmUrl);
+                            resolvedFilms.add(fetchFilmData(filmUrl));
+                        }
+                        logger.info("all film names : "+resolvedFilms);
+                        films = resolvedFilms;
+                    }
 
                     // Create a SearchResult object
-                    SearchResult result = new SearchResult(type, nameField, films.get(0)); // Only map first film URL
+                    SearchResult result = new SearchResult(type, nameField,count, films); // Only map first film URL
                     result.setCount(count);
 
                     return result;
@@ -130,5 +142,52 @@ public class OnlineDataService {
         return new SearchResult(type, name, "No Films Found");
     }
 
+     // Extract film URLs (or any other URL fields) from the JSON node
+     private List<String> extractFilms(JsonNode node) {
+        List<String> films = new ArrayList<>();
+        logger.info("INSIDE EXTRACT FILMS"+node);
+        if (node.has("films")) {
+            JsonNode filmsNode = node.path("films");
+            logger.info("INSIDE EXTRACT FILMS IF "+filmsNode);
+            if (filmsNode.isArray()) {
+                filmsNode.forEach(film -> films.add(film.asText()));
+            }
+        }
+        logger.info("Result of extractFilms "+films);
+        return films;
+    }
 
+    // Fetch film data from a URL
+    private String fetchFilmData(String filmUrl) {
+        try {
+            filmUrl=filmUrl+"?format=json";
+            logger.info("filmURL is : "+filmUrl);
+            disableSslVerification();
+            // Fetch the film details from the given URL
+            HttpURLConnection connection = (HttpURLConnection) new URL(filmUrl).openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            logger.info("Film response code "+responseCode);
+            if (responseCode == HttpURLConnection.HTTP_OK) {  // 200 OK
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                String jsonResponse = response.toString();
+                // Parse the response into JsonNode
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(jsonResponse);
+
+                // Extract film title (or any relevant field)
+                return rootNode.path("title").asText();  // Assuming you want the title of the film
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
