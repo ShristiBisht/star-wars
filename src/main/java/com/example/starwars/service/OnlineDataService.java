@@ -1,8 +1,9 @@
-package com.example.starwars.star_wars.service;
+package com.example.starwars.service;
 
 
 import org.springframework.hateoas.EntityModel;
-import com.example.starwars.star_wars.model.SearchResult;
+
+import com.example.starwars.model.SearchResult;
 
 
 public interface OnlineDataService {

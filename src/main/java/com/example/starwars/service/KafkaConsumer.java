@@ -1,9 +1,10 @@
-package com.example.starwars.star_wars.service;
+package com.example.starwars.service;
 
 
-import com.example.starwars.star_wars.service.SearchService;
+import com.example.starwars.model.SearchResult;
+import com.example.starwars.service.SearchService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.example.starwars.star_wars.model.SearchResult;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.kafka.annotation.KafkaListener;

@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars;
+package com.example.starwars;
 public class Constants {
     
     // https://swapi.dev/api/planets/?search=Tatooine

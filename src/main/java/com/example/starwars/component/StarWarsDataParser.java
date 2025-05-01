@@ -1,11 +1,11 @@
-package com.example.starwars.star_wars.component;
+package com.example.starwars.component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.example.starwars.star_wars.model.SearchResult;
+import com.example.starwars.model.SearchResult;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Component

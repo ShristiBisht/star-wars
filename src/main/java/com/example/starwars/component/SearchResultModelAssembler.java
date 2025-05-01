@@ -1,11 +1,11 @@
-package com.example.starwars.star_wars.component;
+package com.example.starwars.component;
 
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
-import com.example.starwars.star_wars.controller.SearchController;
-import com.example.starwars.star_wars.model.SearchResult;
+import com.example.starwars.controller.SearchController;
+import com.example.starwars.model.SearchResult;
 
 @Component
 public class SearchResultModelAssembler {

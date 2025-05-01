@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars.service.impl;
+package com.example.starwars.service.impl;
 
 
 import java.net.URLEncoder;
@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
-import com.example.starwars.star_wars.component.SearchResultModelAssembler;
-import com.example.starwars.star_wars.component.StarWarsDataParser;
-import com.example.starwars.star_wars.model.SearchResult;
-import com.example.starwars.star_wars.service.OfflineDataService;
-import com.example.starwars.star_wars.service.OnlineDataService;
-import com.example.starwars.star_wars.service.StarWarsApiClient;
+import com.example.starwars.component.SearchResultModelAssembler;
+import com.example.starwars.component.StarWarsDataParser;
+import com.example.starwars.model.SearchResult;
+import com.example.starwars.service.OfflineDataService;
+import com.example.starwars.service.OnlineDataService;
+import com.example.starwars.service.StarWarsApiClient;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Service

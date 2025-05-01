@@ -1,8 +1,8 @@
-package com.example.starwars.star_wars.service.impl;
+package com.example.starwars.service.impl;
 
-import com.example.starwars.star_wars.model.SearchResult;
-import com.example.starwars.star_wars.repository.InMemoryCache;
-import com.example.starwars.star_wars.service.OfflineDataService;
+import com.example.starwars.model.SearchResult;
+import com.example.starwars.repository.InMemoryCache;
+import com.example.starwars.service.OfflineDataService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;

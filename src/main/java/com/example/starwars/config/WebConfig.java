@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars.config;
+package com.example.starwars.config;
 
 import java.util.logging.Logger;
 

@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars.model;
+package com.example.starwars.model;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars;
+package com.example.starwars;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

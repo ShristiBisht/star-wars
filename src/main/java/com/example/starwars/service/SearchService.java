@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars.service;
+package com.example.starwars.service;
 
 import java.util.Collections;
 import java.util.logging.Logger;
@@ -8,8 +8,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
-import com.example.starwars.star_wars.component.SearchResultModelAssembler;
-import com.example.starwars.star_wars.model.SearchResult;
+import com.example.starwars.component.SearchResultModelAssembler;
+import com.example.starwars.model.SearchResult;
 
 @Service
 public class SearchService {

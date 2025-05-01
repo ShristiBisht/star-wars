@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars.service;
+package com.example.starwars.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

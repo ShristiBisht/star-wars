@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars.service.impl;
+package com.example.starwars.service.impl;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.example.starwars.star_wars.service.StarWarsApiClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.starwars.service.StarWarsApiClient;
 import com.fasterxml.jackson.databind.JsonNode;
 
 

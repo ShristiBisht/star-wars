@@ -1,4 +1,4 @@
-package com.example.starwars.star_wars.controller;
+package com.example.starwars.controller;
 
 
 
@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.starwars.star_wars.model.SearchResult;
-import com.example.starwars.star_wars.service.KafkaProducer;
-import com.example.starwars.star_wars.service.SearchService;
+
+import com.example.starwars.model.SearchResult;
+import com.example.starwars.service.KafkaProducer;
+import com.example.starwars.service.SearchService;
 
 
 

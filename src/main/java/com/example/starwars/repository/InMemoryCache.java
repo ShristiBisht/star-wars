@@ -1,8 +1,8 @@
-package com.example.starwars.star_wars.repository;
+package com.example.starwars.repository;
 
 import org.springframework.stereotype.Repository;
 
-import com.example.starwars.star_wars.model.SearchResult;
+import com.example.starwars.model.SearchResult;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
