@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,10 @@ public class OnlineDataServiceImpl implements OnlineDataService {
     @Autowired
     private SearchResultModelAssembler modelAssembler;
 
+    @Value("${starwars.base-url}")
+    private String baseUrl ;
     public EntityModel<SearchResult> fetchData(String type, String name) {
-        String url = String.format("https://swapi.dev/api/%s/?search=%s&format=json", type, URLEncoder.encode(name, StandardCharsets.UTF_8));
+        String url = String.format(baseUrl, type, URLEncoder.encode(name, StandardCharsets.UTF_8));
 
         JsonNode rootNode = starWarsApiClient.fetch(url);
         if (rootNode == null || !rootNode.has("results") || rootNode.path("results").isEmpty()) {
