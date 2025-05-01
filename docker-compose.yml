@@ -1,31 +1,62 @@
 version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: ./frontend
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
     ports:
-      - "3000:80"
-    depends_on:
-      - backend
+      - "9092:9092"
+      - "9093:9093"  # Controller listener
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LOG_DIRS=/bitnami/kafka/data
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    volumes:
+      - kafka_data:/bitnami/kafka
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
       context: .
+    container_name: star-wars-backend
     ports:
       - "8080:8080"
-    depends_on:
-      - kafka
-
-  kafka:
-    image: wurstmeister/kafka:latest
-    ports:
-      - "9093:9093"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9093
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
 
-  zookeeper:
-    image: wurstmeister/zookeeper:latest
+  frontend:
+    build:
+      context: ./frontend
+    container_name: star-wars-frontend
     ports:
-      - "2181:2181"
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8081:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+
+volumes:
+  kafka_data:

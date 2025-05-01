@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.starwars.star_wars.model.SearchResult;
+import com.example.starwars.star_wars.service.KafkaProducer;
 import com.example.starwars.star_wars.service.SearchService;
 
 
@@ -24,13 +25,17 @@ import com.example.starwars.star_wars.service.SearchService;
 public class SearchController {
 
     @Autowired
+    private KafkaProducer kafkaProducer;
+
+    @Autowired
     private SearchService searchService;
     Logger logger = Logger.getLogger("SearchController.class");
 
     @GetMapping("/search")
     public EntityModel<SearchResult> search(@RequestParam String type, @RequestParam String name, @RequestParam Boolean offlineMode) {
-        logger.info("We are getting here");
-        return searchService.search(type, name,offlineMode);
+        logger.info("Sending message to Kafka...");
+        kafkaProducer.sendSearchRequest(type, name, offlineMode);
+        return searchService.search(type, name, offlineMode);
     }
 
     // Endpoint for updating data (and evicting the cache)
