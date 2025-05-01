@@ -6,11 +6,9 @@ import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.starwars.star_wars.model.SearchResult;
@@ -20,8 +18,6 @@ import com.example.starwars.star_wars.service.SearchService;
 
 
 @RestController
-// @RequestMapping("/api/starwars")
-// @CrossOrigin(origins = "http://localhost:3000") 
 public class SearchController {
 
     @Autowired
