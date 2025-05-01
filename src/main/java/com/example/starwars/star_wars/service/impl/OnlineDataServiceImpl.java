@@ -36,6 +36,7 @@ public class OnlineDataServiceImpl implements OnlineDataService {
 
     @Value("${starwars.base-url}")
     private String baseUrl ;
+    
     public EntityModel<SearchResult> fetchData(String type, String name) {
         String url = String.format(baseUrl, type, URLEncoder.encode(name, StandardCharsets.UTF_8));
 

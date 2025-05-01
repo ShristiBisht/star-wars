@@ -1,5 +1,6 @@
 package com.example.starwars.star_wars.service;
 
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,11 @@ public class SearchService {
             }
         }
 
+        if ("films".equalsIgnoreCase(type)) {
+
+        result.setName(name);
+        result.setFilms(Collections.singletonList(name));
+        }
         result.setOfflineMode(offlineMode);
 
         return assembler.toModel(result);  // wrap with HATEOAS EntityModel
