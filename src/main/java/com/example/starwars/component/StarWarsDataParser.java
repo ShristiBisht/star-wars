@@ -11,22 +11,37 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Component
 public class StarWarsDataParser {
 
+    // Utility method to safely extract a String from a JsonNode with a default value
+    private String getSafeText(JsonNode node, String fieldName, String defaultValue) {
+        if (node.has(fieldName)) {
+            return node.path(fieldName).asText(defaultValue);
+        }
+        return defaultValue;
+    }
+
+    // Utility method to extract a List of Strings from a JsonNode (for films)
+    private List<String> getFilms(JsonNode filmsNode) {
+        List<String> filmUrls = new ArrayList<>();
+        if (filmsNode != null && filmsNode.isArray()) {
+            filmsNode.forEach(filmNode -> filmUrls.add(filmNode.asText()));
+        }
+        return filmUrls;
+    }
+
+    // Parses the search result data
     public SearchResult parseResult(String type, String name, JsonNode rootNode) {
         int count = rootNode.path("count").asInt();
         JsonNode firstResult = rootNode.path("results").get(0);
-        String entityName = firstResult.path("name").asText();
-        List<String> filmUrls = new ArrayList<>();
 
-        if (firstResult.has("films")) {
-            for (JsonNode filmNode : firstResult.path("films")) {
-                filmUrls.add(filmNode.asText());
-            }
-        }
+        // Use the utility methods to get the data
+        String entityName = getSafeText(firstResult, "name", "Unknown Entity");
+        List<String> filmUrls = getFilms(firstResult.path("films"));
 
         return new SearchResult(type, entityName, count, filmUrls);
     }
 
+    // Parses the film title from a JsonNode
     public String parseFilmTitle(JsonNode filmNode) {
-        return filmNode.path("title").asText();
+        return getSafeText(filmNode, "title", "Unknown Film Title");
     }
 }

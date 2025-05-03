@@ -69,6 +69,12 @@
 			<groupId>org.springframework.batch</groupId>
 			<artifactId>spring-batch-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+				  <groupId>org.junit.vintage</groupId>
+				  <artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			  </exclusions>
 		</dependency>
 		<!-- Spring Boot Starter Security - for Authentication and Session Management -->
 		<dependency>
@@ -100,10 +106,35 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		 <!-- Optional: AssertJ (included in starter-test but useful to know) -->
+		 <dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		  </dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.10</version>
+				<executions>
+				  <execution>
+					<goals>
+					  <goal>prepare-agent</goal>
+					</goals>
+				  </execution>
+				  <execution>
+					<id>report</id>
+					<phase>verify</phase>
+					<goals>
+					  <goal>report</goal>
+					</goals>
+				  </execution>
+				</executions>
+			  </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
