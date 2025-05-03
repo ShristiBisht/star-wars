@@ -1,52 +1,87 @@
 package com.example.starwars.component;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.example.starwars.model.SearchResult;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class StarWarsDataParserTest {
 
+    private final StarWarsDataParser parser = new StarWarsDataParser();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Test
-    void testParseResult() {
-        StarWarsDataParser parser = new StarWarsDataParser();
+    void testParseResult_withValidJson_shouldReturnParsedResult() throws IOException {
+        String json = """
+            {
+              "count": 1,
+              "results": [
+                {
+                  "name": "Luke Skywalker",
+                  "films": [
+                    "https://swapi.dev/api/films/1/",
+                    "https://swapi.dev/api/films/2/"
+                  ]
+                }
+              ]
+            }
+            """;
 
-        // Mock JsonNode for testing
-        JsonNode rootNode = mock(JsonNode.class);
-        JsonNode resultsNode = mock(JsonNode.class);
-        JsonNode firstResultNode = mock(JsonNode.class);
-        JsonNode filmsNode = mock(JsonNode.class);
+        JsonNode rootNode = objectMapper.readTree(json);
+        SearchResult result = parser.parseResult("people", "Luke", rootNode);
 
-        when(rootNode.path("count")).thenReturn(mock(JsonNode.class));
-        when(rootNode.path("results")).thenReturn(resultsNode);
-        when(resultsNode.get(0)).thenReturn(firstResultNode);
-        when(firstResultNode.path("name")).thenReturn(mock(JsonNode.class));
-        when(firstResultNode.path("films")).thenReturn(filmsNode);
-
-        // Test mock behaviors
-        when(firstResultNode.path("name").asText()).thenReturn("Millennium Falcon");
-        when(filmsNode.isArray()).thenReturn(true);
-
-        // Create a SearchResult object based on the mock data
-        SearchResult result = parser.parseResult("starship", "Millennium Falcon", rootNode);
-
-        assertEquals("starship", result.getType());
-        assertEquals(0, result.getCount());  // Mocking count value
-        assertNotNull(result.getFilms());
+        assertEquals("people", result.getType());
+        assertEquals("Luke Skywalker", result.getName());
+        assertEquals(1, result.getCount());
+        assertEquals(List.of(
+            "https://swapi.dev/api/films/1/",
+            "https://swapi.dev/api/films/2/"), result.getFilms());
     }
 
     @Test
-    void testParseFilmTitle() {
-        StarWarsDataParser parser = new StarWarsDataParser();
+    void testParseResult_withMissingNameAndFilms_shouldReturnDefaults() throws IOException {
+        String json = """
+            {
+              "count": 0,
+              "results": [
+                {}
+              ]
+            }
+            """;
 
-        JsonNode filmNode = mock(JsonNode.class);
-        when(filmNode.path("title")).thenReturn(mock(JsonNode.class));
+        JsonNode rootNode = objectMapper.readTree(json);
+        SearchResult result = parser.parseResult("people", "Unknown", rootNode);
 
+        assertEquals("people", result.getType());
+        assertEquals("Unknown Entity", result.getName());
+        assertEquals(0, result.getCount());
+        assertTrue(result.getFilms().isEmpty());
+    }
+
+    @Test
+    void testParseFilmTitle_withValidTitle_shouldReturnTitle() throws IOException {
+        String json = """
+            {
+              "title": "A New Hope"
+            }
+            """;
+
+        JsonNode filmNode = objectMapper.readTree(json);
+        String title = parser.parseFilmTitle(filmNode);
+
+        assertEquals("A New Hope", title);
+    }
+
+    @Test
+    void testParseFilmTitle_withMissingTitle_shouldReturnDefault() throws IOException {
+        String json = "{}";
+
+        JsonNode filmNode = objectMapper.readTree(json);
         String title = parser.parseFilmTitle(filmNode);
 
         assertEquals("Unknown Film Title", title);
