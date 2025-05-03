@@ -29,25 +29,28 @@ self.addEventListener('activate', (event) => {
 // Fetch
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return (
-        cachedResponse ||
-        fetch(event.request)
-          .then((response) => {
-            if (
-              event.request.url.includes('swapi.dev') ||
-              event.request.destination === 'script' ||
-              event.request.destination === 'style'
-            ) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(event.request, responseClone);
-              });
-            }
-            return response;
-          })
-          .catch(() => caches.match('/'))
-      );
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request)
+        .then((response) => {
+          if (
+            response &&
+            response.status === 200 &&
+            response.type !== 'opaque' &&
+            shouldCache(event.request)
+          ) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) =>
+              cache.put(event.request, responseClone)
+            );
+          }
+          return response;
+        })
+        .catch((err) => {
+          console.error("Network fetch failed:", err);
+          return caches.match('/');
+        });
     })
   );
 });
+
