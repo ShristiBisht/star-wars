@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.example.starwars.component.SearchResultModelAssembler;
 import com.example.starwars.component.StarWarsDataParser;
@@ -22,18 +23,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Service
 public class OnlineDataServiceImpl implements OnlineDataService {
 
-    @Autowired
     private StarWarsApiClient starWarsApiClient;
-
-    @Autowired
     private StarWarsDataParser parser;
-
-    @Autowired
     private OfflineDataService offlineDataService;
-
-    @Autowired
     private SearchResultModelAssembler modelAssembler;
 
+    @Autowired
+    public OnlineDataServiceImpl(SearchResultModelAssembler modelAssembler,OfflineDataService offlineDataService, StarWarsDataParser parser, StarWarsApiClient starWarsApiClient) {
+        this.starWarsApiClient=starWarsApiClient;
+        this.parser=parser;
+        this.offlineDataService= offlineDataService;
+        this.modelAssembler=modelAssembler;
+  }
     @Value("${starwars.base-url}")
     private String baseUrl ;
     

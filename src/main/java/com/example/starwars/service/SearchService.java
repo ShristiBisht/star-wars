@@ -14,14 +14,17 @@ import com.example.starwars.model.SearchResult;
 @Service
 public class SearchService {
 
-    @Autowired
     private OnlineDataService onlineDataService;
-    
-    @Autowired
     private OfflineDataService offlineDataService;
+    private SearchResultModelAssembler assembler;
 
     @Autowired
-    private SearchResultModelAssembler assembler;
+    public SearchService(SearchResultModelAssembler assembler, OfflineDataService offlineDataService,OnlineDataService onlineDataService){
+        this.onlineDataService=onlineDataService;
+        this.offlineDataService=offlineDataService;
+        this.assembler=assembler;
+    }
+
 
     Logger logger = Logger.getLogger("SearchService");
 

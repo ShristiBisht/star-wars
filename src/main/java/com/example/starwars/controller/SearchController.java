@@ -17,16 +17,21 @@ import com.example.starwars.service.KafkaProducer;
 import com.example.starwars.service.SearchService;
 
 
-
 @RestController
 public class SearchController {
 
-    @Autowired
+    
     private KafkaProducer kafkaProducer;
 
-    @Autowired
     private SearchService searchService;
+
     Logger logger = Logger.getLogger("SearchController.class");
+
+    @Autowired
+    public void SearchController(KafkaProducer kafkaProducer,SearchService searchService ){
+        this.kafkaProducer=kafkaProducer;
+        this.searchService=searchService;   
+    }
 
     @GetMapping("/search")
     public EntityModel<SearchResult> search(@RequestParam String type, @RequestParam String name, @RequestParam Boolean offlineMode) {

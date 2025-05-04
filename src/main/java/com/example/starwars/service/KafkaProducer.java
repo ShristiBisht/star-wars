@@ -9,9 +9,13 @@ public class KafkaProducer {
 
     private static final String TOPIC = "search-requests";
 
-    @Autowired
+    
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    @Autowired
+    public KafkaProducer(KafkaTemplate<String, String> kafkaTemplate){
+        this.kafkaTemplate=kafkaTemplate;
+    }
     public void sendSearchRequest(String type, String name, boolean offlineMode) {
         String message = type + "|" + name + "|" + offlineMode;
         kafkaTemplate.send(TOPIC, message);

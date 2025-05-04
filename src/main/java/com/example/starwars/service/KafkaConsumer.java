@@ -15,10 +15,14 @@ import java.util.logging.Logger;
 @Service
 public class KafkaConsumer{
 
-    @Autowired
     private SearchService searchService;
-
     private Logger logger = Logger.getLogger(KafkaConsumer.class.getName());
+
+    @Autowired
+    public KafkaConsumer( SearchService searchService){
+        this.searchService=searchService;
+    }
+
 
     @KafkaListener(topics = "search-requests", groupId = "star-wars-group")
     public void consume(String message) {
