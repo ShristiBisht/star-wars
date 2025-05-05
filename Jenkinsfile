@@ -1,11 +1,5 @@
-pipeline {
-    agent any
-    stages {
-        stage('Docker CLI Test') {
-            steps {
-                sh 'docker --version'
-                sh 'docker ps '
-            }
-        }
+stage('Start services') {
+    steps {
+        sh 'docker-compose up -d --build'
     }
 }
