@@ -9,7 +9,13 @@ pipeline {
     stages {
         stage('Initialize') {
             steps {
-                sh 'docker --version'
+                sh '''
+                    docker --version
+                    # Add jenkins user to docker group
+                    groupadd docker || true
+                    usermod -aG docker jenkins || true
+                    newgrp docker || true
+                '''
             }
         }
 
