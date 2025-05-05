@@ -1,11 +1,18 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:24.0-cli'  // Lightweight image with Docker CLI
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
+    agent any
+
+    environment {
+        DOCKER_HOME = tool 'myDocker'
+        PATH = "${DOCKER_HOME}/bin:${env.PATH}"
     }
+
     stages {
+        stage('Initialize') {
+            steps {
+                sh 'docker --version'
+            }
+        }
+
         stage('Docker Test') {
             steps {
                 sh 'docker ps'
