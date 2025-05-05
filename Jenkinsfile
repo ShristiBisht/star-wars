@@ -4,7 +4,7 @@ pipeline {
         stage('Docker CLI Test') {
             steps {
                 sh 'docker --version'
-                sh 'docker ps'
+                sh 'docker ps '
             }
         }
     }
