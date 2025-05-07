@@ -37,10 +37,13 @@ const SearchForm = () => {
     }
 
     try {
-      const data = await fetchEntityData(type, name);
-      setResult(data);
-      setError(null);
-      storeInCache(type, name, data);
+      if(!offlineMode){
+        // If not in offline mode, fetch data from the API
+        const data = await fetchEntityData(type, name,offlineMode);
+        setResult(data);
+        setError(null);
+        storeInCache(type, name, data);
+      }
     } catch (err) {
       console.error('API Error:', err);
       setError('Unable to fetch data. Please try again later.');
