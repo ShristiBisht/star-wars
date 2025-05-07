@@ -41,7 +41,7 @@ services:
       context: ./frontend
     container_name: star-wars-frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
 
