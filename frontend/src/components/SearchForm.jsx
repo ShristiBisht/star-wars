@@ -1,52 +1,63 @@
 import React, { useState } from 'react';
-import { getCachedData, storeInCache } from '../services/cacheService';
-import { fetchEntityData } from '../services/apiService';
-
-const types = ['planets', 'starships', 'vehicles', 'people', 'films', 'species'];
+import axios from 'axios';
 
 const SearchForm = () => {
-  const [formData, setFormData] = useState({ type: 'planets', name: '' });
+  const [type, setType] = useState('planets');
+  const [name, setName] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [offlineMode, setOfflineMode] = useState(false);
+  const [offlineMode, setOfflineMode] = useState(false);  // Add offlineMode state
 
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const types = ['planets', 'starships', 'vehicles', 'people', 'films', 'species'];
+
+  const toggleOfflineMode = () => {
+    setOfflineMode(!offlineMode);  // Toggle offline mode
+  };
+
+  // Function to check and fetch cached data from localStorage
+  const getCachedData = (type, name) => {
+    const cachedData = localStorage.getItem(`${type}-${name}`);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+    return null;
+  };
+
+  // Function to store data in localStorage
+  const storeInLocalStorage = (type, name, data) => {
+    localStorage.setItem(`${type}-${name}`, JSON.stringify(data));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { type, name } = formData;
-
-    if (!name.trim()) {
-      setError('Please enter a valid name.');
-      setResult(null);
+    const cachedData = getCachedData(type, name);
+    if (offlineMode && cachedData) {
+      console.log("Caching in local storage")
+      setResult(cachedData);
+      setError(null);
       return;
     }
-
-    const cached = getCachedData(type, name);
-    if (offlineMode) {
-      if (cached) {
-        setResult(cached);
-        setError(null);
-      } else {
-        setError('No cached data available for offline mode.');
-        setResult(null);
-      }
-      return;
+    else if(!cachedData){
+      console.error("No data in cache");
+      setError("Sorry, we couldn't find anything matching your search in offline mode.");
+      setResult(null);
     }
 
     try {
       if(!offlineMode){
         // If not in offline mode, fetch data from the API
-        const data = await fetchEntityData(type, name,offlineMode);
-        setResult(data);
+        const response = await axios.get(`http://localhost:8080/search`, {
+          params: { type, name,offlineMode },
+          withCredentials: true,  // Send cookies with the request
+        });
+        setResult(response.data);
         setError(null);
-        storeInCache(type, name, data);
+        storeInLocalStorage(type, name, response.data);
       }
-    } catch (err) {
-      console.error('API Error:', err);
-      setError('Unable to fetch data. Please try again later.');
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Sorry, we couldn't find anything matching your search.");
       setResult(null);
     }
   };
@@ -58,13 +69,14 @@ const SearchForm = () => {
           <label htmlFor="type">Type</label>
           <select
             id="type"
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
+            value={type}
+            onChange={(e) => setType(e.target.value)}
             className="form-control"
           >
-            {types.map((t) => (
-              <option key={t} value={t}>{t}</option>
+            {types.map((typeOption, index) => (
+              <option key={index} value={typeOption}>
+                {typeOption}
+              </option>
             ))}
           </select>
         </div>
@@ -72,24 +84,26 @@ const SearchForm = () => {
         <div className="form-group">
           <label htmlFor="name">Name</label>
           <input
+            type="text"
             id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="form-control"
+            placeholder="Enter name"
           />
         </div>
 
         <button type="submit" className="btn btn-primary">Search</button>
       </form>
 
+      {/* Toggle for Offline Mode */}
       <div className="offline-toggle mt-4">
-        <button onClick={() => setOfflineMode(prev => !prev)} className="btn btn-secondary">
+        <button onClick={toggleOfflineMode} className="btn btn-secondary">
           {offlineMode ? "Switch to Online Mode" : "Switch to Offline Mode"}
         </button>
       </div>
 
+      {/* Display result */}
       {result && (
         <div className="result mt-4 p-4 border rounded shadow-sm">
           <h3 className="mb-3 text-primary">Result</h3>
@@ -98,8 +112,10 @@ const SearchForm = () => {
           <div><strong>Count:</strong> {result.count}</div>
           <div><strong>Films:</strong>
             <ul className="list-disc ml-5">
-              {(result.films?.length > 0) ? (
-                result.films.map((film, i) => <li key={i}>{film}</li>)
+              {result.films && result.films.length > 0 ? (
+                result.films.map((film, index) => (
+                  <li key={index}>{film}</li>
+                ))
               ) : (
                 <li>No Films Available</li>
               )}
@@ -108,7 +124,8 @@ const SearchForm = () => {
         </div>
       )}
 
-      {error && <div className="alert alert-danger mt-4">{error}</div>}
+      {/* Display error message */}
+      {error && <p className="error mt-4">{error}</p>}
     </div>
   );
 };
