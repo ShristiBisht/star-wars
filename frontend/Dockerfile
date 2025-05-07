@@ -20,6 +20,9 @@ FROM nginx:alpine
 # Copy the built React app from the previous stage into Nginx's default HTML directory
 COPY --from=build /app/build /usr/share/nginx/html
 
+# Copy custom nginx config for proxying
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose port 80 for HTTP traffic
 EXPOSE 80
 

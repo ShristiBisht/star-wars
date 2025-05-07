@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const fetchEntityData = async (type, name) => {
-  const response = await axios.get(`http://localhost:8080/search`, {
+  const response = await axios.get(`/api/search`, {
     params: { type, name },
     withCredentials: true,
   });
