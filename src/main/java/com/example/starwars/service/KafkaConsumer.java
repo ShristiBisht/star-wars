@@ -34,7 +34,7 @@ public class KafkaConsumer{
         String name = parts[1];
         boolean offlineMode = Boolean.parseBoolean(parts[2]);
 
-        EntityModel<SearchResult> result = searchService.search(type, name, offlineMode);
+        EntityModel<SearchResult> result = searchService.search(type, name, false);
         logger.info("Result from Kafka consumer: " + result.getContent());
     }
 }

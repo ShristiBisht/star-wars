@@ -30,12 +30,14 @@ public class SearchService {
 
     public EntityModel<SearchResult> search(String type, String name, boolean offlineMode) {
         SearchResult result;
-
-        if (offlineMode) {
+        logger.info("Yha pe to hai na tu");
+        if (type==null) {
             logger.info("Offline mode is enabled");
             result = offlineDataService.fetchData(type, name);
         } else {
+            logger.info("Offline mode is disabled");
             result = onlineDataService.fetchData(type, name).getContent();
+            logger.info("Result is "+result);
             if (result == null) {
                 logger.info("Online fetch returned null, falling back to offline");
                 result = offlineDataService.fetchData(type, name);
@@ -47,7 +49,7 @@ public class SearchService {
         result.setName(name);
         result.setFilms(Collections.singletonList(name));
         }
-        result.setOfflineMode(offlineMode);
+        result.setOfflineMode(false);
 
         return assembler.toModel(result);  // wrap with HATEOAS EntityModel
     }

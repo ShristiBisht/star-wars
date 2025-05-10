@@ -14,6 +14,6 @@ public class SearchResultModelAssembler {
     public EntityModel<SearchResult> toModel(SearchResult result) {
         return EntityModel.of(result,
             WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(SearchController.class)
-                .search(result.getType(), result.getName(), result.getOfflineMode())).withSelfRel());
+                .search(result.getType(), result.getName(), false)).withSelfRel());
     }
 }

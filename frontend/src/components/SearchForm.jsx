@@ -1,29 +1,35 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { getCachedData, storeInCache } from '../services/cacheService';
+import { fetchEntityData } from '../services/apiService';
 
 const SearchForm = () => {
   const [type, setType] = useState('planets');
   const [name, setName] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [offlineMode, setOfflineMode] = useState(false);  // Add offlineMode state
+  const [offlineMode, setOfflineMode] = useState(false);
 
   const types = ['planets', 'starships', 'vehicles', 'people', 'films', 'species'];
 
   const toggleOfflineMode = () => {
-    setOfflineMode(!offlineMode);  // Toggle offline mode
+    setOfflineMode(!offlineMode);
   };
 
-  // Function to check and fetch cached data from localStorage
+  // const getCachedData = (type, name) => {
+  //   const cachedData = localStorage.getItem(`${type}-${name}`);
+  //   return cachedData ? JSON.parse(cachedData) : null;
+  // };
+
   const getCachedData = (type, name) => {
     const cachedData = localStorage.getItem(`${type}-${name}`);
-    if (cachedData) {
-      return JSON.parse(cachedData);
+    try {
+      return cachedData ? JSON.parse(cachedData) : null;
+    } catch (error) {
+      console.error("Failed to parse cached data:", error);
+      return null;
     }
-    return null;
   };
-
-  // Function to store data in localStorage
+  
   const storeInLocalStorage = (type, name, data) => {
     localStorage.setItem(`${type}-${name}`, JSON.stringify(data));
   };
@@ -31,34 +37,33 @@ const SearchForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const cachedData = getCachedData(type, name);
-    if (offlineMode && cachedData) {
-      console.log("Caching in local storage")
-      setResult(cachedData);
-      setError(null);
+    if (offlineMode) {
+      if (cachedData) {
+        setResult(cachedData);
+        setError(null);
+      } else {
+        console.error("No data in cache");
+        setError("Sorry, we couldn't find anything matching your search in offline mode.");
+        setResult(null);
+      }
       return;
     }
-    else if(!cachedData){
-      console.error("No data in cache");
-      setError("Sorry, we couldn't find anything matching your search in offline mode.");
-      setResult(null);
-    }
 
+    // Online mode
     try {
-      if(!offlineMode){
-        // If not in offline mode, fetch data from the API
-        const response = await axios.get(`http://localhost:8080/search`, {
-          params: { type, name,offlineMode },
-          withCredentials: true,  // Send cookies with the request
-        });
-        setResult(response.data);
-        setError(null);
-        storeInLocalStorage(type, name, response.data);
+      const response = await fetchEntityData(type, name);
+      setResult(response.data);
+      setError(null);
+      storeInLocalStorage(type, name, response.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      if (cachedData) {
+        setResult(cachedData);
+        setError("You're offline. Showing cached result.");
+      } else {
+        setResult(null);
+        setError("Sorry, we couldn't find anything matching your search.");
       }
-      
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError("Sorry, we couldn't find anything matching your search.");
-      setResult(null);
     }
   };
 
@@ -96,14 +101,15 @@ const SearchForm = () => {
         <button type="submit" className="btn btn-primary">Search</button>
       </form>
 
-      {/* Toggle for Offline Mode */}
       <div className="offline-toggle mt-4">
         <button onClick={toggleOfflineMode} className="btn btn-secondary">
           {offlineMode ? "Switch to Online Mode" : "Switch to Offline Mode"}
         </button>
+        <p className="mt-2">
+          Mode: <strong>{offlineMode ? "Offline (cache)" : "Online (live API)"}</strong>
+        </p>
       </div>
 
-      {/* Display result */}
       {result && (
         <div className="result mt-4 p-4 border rounded shadow-sm">
           <h3 className="mb-3 text-primary">Result</h3>
@@ -124,8 +130,7 @@ const SearchForm = () => {
         </div>
       )}
 
-      {/* Display error message */}
-      {error && <p className="error mt-4">{error}</p>}
+      {error && <p className="error mt-4 text-danger">{error}</p>}
     </div>
   );
 };

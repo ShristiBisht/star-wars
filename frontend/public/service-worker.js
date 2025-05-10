@@ -1,7 +1,6 @@
 const CACHE_NAME = 'star-wars-cache-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
   'https://swapi.dev/api/starships',
   'https://swapi.dev/api/people'
 ];
@@ -30,27 +29,42 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+      // If cached response exists, return it
+      if (cached) {
+        return cached;
+      }
+
+      // If not cached, fetch from network
       return fetch(event.request)
         .then((response) => {
+          // If the response is valid, cache it
           if (
             response &&
             response.status === 200 &&
             response.type !== 'opaque' &&
-            shouldCache(event.request)
+            shouldCache(event.request) // Ensure this function exists and works
           ) {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) =>
               cache.put(event.request, responseClone)
             );
           }
-          return response;
+          return response;  // return the network response
         })
         .catch((err) => {
           console.error("Network fetch failed:", err);
-          return caches.match('/');
+          // Fallback to a static response (if the network request fails)
+          return caches.match('/index.html').then((fallbackResponse) => {
+            return fallbackResponse || new Response("Offline", { status: 503 }); // Fallback to a hardcoded response
+          });
         });
     })
   );
 });
 
+// Function to determine whether or not to cache
+function shouldCache(request) {
+  // Implement logic to decide whether or not to cache
+  // For example, caching only API requests, etc.
+  return request.url.includes('swapi.dev/api');
+}
