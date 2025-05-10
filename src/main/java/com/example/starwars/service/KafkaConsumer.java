@@ -28,13 +28,11 @@ public class KafkaConsumer{
     public void consume(String message) {
         logger.info("Received Kafka message: " + message);
         String[] parts = message.split("\\|");
-        if (parts.length != 3) return;
+        if (parts.length != 2) return;
 
         String type = parts[0];
         String name = parts[1];
-        boolean offlineMode = Boolean.parseBoolean(parts[2]);
-
-        EntityModel<SearchResult> result = searchService.search(type, name, false);
+        EntityModel<SearchResult> result = searchService.search(type, name);
         logger.info("Result from Kafka consumer: " + result.getContent());
     }
 }

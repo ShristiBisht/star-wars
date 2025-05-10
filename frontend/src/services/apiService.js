@@ -3,10 +3,10 @@ import axios from 'axios';
 export const fetchEntityData = async (type, name) => {
   try {
     const response = await axios.get('/api/search', {
-      params: { type, name,offlineMode: false },
+      params: { type, name },
       withCredentials: true,
     });
-
+    console.log("response is",response)
     // Validate that the response is a proper object (optional, but useful)
     if (typeof response.data !== 'object' || response.data === null) {
       throw new Error('Invalid response: expected a JSON object.');

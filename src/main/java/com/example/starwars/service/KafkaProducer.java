@@ -16,8 +16,8 @@ public class KafkaProducer {
     public KafkaProducer(KafkaTemplate<String, String> kafkaTemplate){
         this.kafkaTemplate=kafkaTemplate;
     }
-    public void sendSearchRequest(String type, String name, boolean offlineMode) {
-        String message = type + "|" + name + "|" + offlineMode;
+    public void sendSearchRequest(String type, String name) {
+        String message = type + "|" + name ;
         kafkaTemplate.send(TOPIC, message);
     }
 }

@@ -28,9 +28,8 @@ public class SearchService {
 
     Logger logger = Logger.getLogger("SearchService");
 
-    public EntityModel<SearchResult> search(String type, String name, boolean offlineMode) {
+    public EntityModel<SearchResult> search(String type, String name) {
         SearchResult result;
-        logger.info("Yha pe to hai na tu");
         if (type==null) {
             logger.info("Offline mode is enabled");
             result = offlineDataService.fetchData(type, name);
@@ -49,7 +48,6 @@ public class SearchService {
         result.setName(name);
         result.setFilms(Collections.singletonList(name));
         }
-        result.setOfflineMode(false);
 
         return assembler.toModel(result);  // wrap with HATEOAS EntityModel
     }

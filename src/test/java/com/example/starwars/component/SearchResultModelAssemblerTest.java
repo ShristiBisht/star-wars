@@ -27,7 +27,6 @@ public class SearchResultModelAssemblerTest {
         SearchResult mockResult = new SearchResult();
         mockResult.setType("planets");
         mockResult.setName("Tatooine");
-        mockResult.setOfflineMode(false);
 
         // Act
         EntityModel<SearchResult> model = assembler.toModel(mockResult);

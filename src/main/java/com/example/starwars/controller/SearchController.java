@@ -37,10 +37,10 @@ public class SearchController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/search")
-    public EntityModel<SearchResult> search(@RequestParam String type, @RequestParam String name, @RequestParam Boolean offlineMode) {
+    public EntityModel<SearchResult> search(@RequestParam String type, @RequestParam String name) {
         logger.info("Sending message to Kafka...");
-        kafkaProducer.sendSearchRequest(type, name, offlineMode);
-        return searchService.search(type, name, offlineMode);
+        kafkaProducer.sendSearchRequest(type, name);
+        return searchService.search(type, name);
     }
 
     // Endpoint for updating data (and evicting the cache)

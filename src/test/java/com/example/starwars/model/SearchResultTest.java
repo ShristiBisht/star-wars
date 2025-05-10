@@ -35,13 +35,11 @@ class SearchResultTest {
         result.setName("Millennium Falcon");
         result.setCount(1);
         result.setFilms(List.of("Return of the Jedi"));
-        result.setOfflineMode(true);
 
         assertEquals("Spaceship", result.getType());
         assertEquals("Millennium Falcon", result.getName());
         assertEquals(1, result.getCount());
         assertEquals(List.of("Return of the Jedi"), result.getFilms());
-        assertTrue(result.getOfflineMode());
     }
 
     @Test
