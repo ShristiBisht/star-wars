@@ -45,7 +45,7 @@ class SearchResultTest {
     @Test
     void testToString() {
         SearchResult result = new SearchResult("Character", "Luke Skywalker", 1, List.of("A New Hope", "Empire Strikes Back"));
-        String expected = "SearchResult{type='Character', name='Luke Skywalker', count=1', films=[A New Hope, Empire Strikes Back]', offline Mode=null}";
+        String expected = "SearchResult{type='Character', name='Luke Skywalker', count=1', films=[A New Hope, Empire Strikes Back]'}";
         assertEquals(expected, result.toString());
     }
 }

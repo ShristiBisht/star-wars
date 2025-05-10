@@ -60,7 +60,6 @@ public class StarWarsApiClientImpl implements StarWarsApiClient {
             connection.setRequestMethod("GET");
 
             int responseCode = connection.getResponseCode();
-            //  TODO: getting called 5 times, need to check
             logger.info("HTTP Response: {}", responseCode);
 
             if (responseCode == 200) {

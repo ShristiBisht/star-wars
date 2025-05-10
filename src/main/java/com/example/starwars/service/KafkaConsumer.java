@@ -2,8 +2,6 @@ package com.example.starwars.service;
 
 
 import com.example.starwars.model.SearchResult;
-import com.example.starwars.service.SearchService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;

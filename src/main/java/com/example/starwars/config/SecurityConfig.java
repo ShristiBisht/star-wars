@@ -19,22 +19,8 @@ csrf(csrf -> csrf.disable()): CSRF protection is disabled in this example.
  
 public class SecurityConfig {
 
-    // TODO: security
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // http
-        //     .csrf(csrf -> csrf.disable())  // Disable CSRF using Customizer
-        //     .authorizeHttpRequests(auth -> auth
-        //         .requestMatchers("/login", "/logout", "/api/**").permitAll()  // Allow login and logout without authentication
-        //         .anyRequest().authenticated()  // All other endpoints require authentication
-        //     )
-        //     .formLogin(formLogin -> formLogin
-        //         .loginPage("/login")
-        //         .permitAll()  // Allow access to login page without authentication
-        //     )
-        //     .logout(logout -> logout
-        //         .permitAll()  // Allow logout without authentication
-        //     );
         http
         // Enable CORS and disable CSRF (assuming you want a stateless, cross-origin frontend/backend setup)
         .cors(Customizer.withDefaults())
