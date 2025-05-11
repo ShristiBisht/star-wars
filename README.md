@@ -138,9 +138,41 @@
 
 ---
 
-# Testing Ideas
+## Design Patterns Used
 
-- Simulate offline mode and observe fallback to cache.
-- Load multiple entity types to verify `SearchResult` displays them correctly.
-- Test search while backend is down to confirm error handling.
-- Test Kafka flow with a test consumer producing to `search-requests`.
+This microservice applies several core object-oriented and architectural design patterns to ensure modularity, testability, and maintainability.
+
+---
+### 1. **Strategy Pattern**
+- **Context**: Selection between online and offline data fetching strategies.
+- **Implementations**:
+  - `OnlineDataServiceImpl` (calls Star Wars API)
+  - `OfflineDataServiceImpl` (uses in-memory data)
+- **Interface**: `SearchService`
+- **Benefit**: Allows runtime flexibility in choosing data fetching logic.
+
+---
+
+### 2. **Adapter Pattern**
+- **Class**: `StarWarsDataParser`
+- **Purpose**: Converts third-party JSON API responses into internal `SearchResult` objects.
+- **Benefit**: Isolates and encapsulates the transformation logic from the rest of the application.
+
+---
+
+### 3. **Decorator Pattern** (via Spring Cache)
+- **Annotation**: `@Cacheable("searchResults")`
+- **Class**: `OnlineDataServiceImpl`
+- **Purpose**: Adds caching behavior without altering the core method.
+- **Benefit**: Enhances performance and scalability transparently.
+
+---
+
+### 4. **Observer Pattern** (via Kafka)
+- **Components**:
+  - `KafkaProducer`: Publishes search logs.
+  - `KafkaConsumer`: Consumes and logs messages.
+- **Purpose**: Enables asynchronous event-driven logging.
+- **Benefit**: Loose coupling and non-blocking communication.
+
+---
