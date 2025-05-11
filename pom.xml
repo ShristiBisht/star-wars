@@ -137,32 +137,27 @@
 				  <execution>
 					<goals>
 					  <goal>prepare-agent</goal>
-					</goals>
-				  </execution>
-				  <execution>
-					<id>report</id>
-					<phase>verify</phase>
-					<goals>
 					  <goal>report</goal>
+					  <goal>check</goal> <!-- Check coverage threshold -->
 					</goals>
 				  </execution>
 				</executions>
 				<configuration>
-					<check>
-					  <rules>
-						<rule>
-						  <element>METHOD</element>
-						  <limits>
-							<limit>
-							  <counter>COVEREDRATIO</counter>
-							  <value>60</value> <!-- 60% minimum coverage -->
-							</limit>
-						  </limits>
-						</rule>
-						<!-- You can add more rules for CLASS, LINE, etc., as per your requirement -->
-					  </rules>
-					</check>
-				  </configuration>
+				  <check>
+					<rules>
+					  <rule>
+						<element>METHOD</element>
+						<limits>
+						  <limit>
+							<counter>COVEREDRATIO</counter>
+							<value>60</value> <!-- 60% minimum coverage -->
+						  </limit>
+						</limits>
+					  </rule>
+					  <!-- You can add more rules for CLASS, LINE, etc., as per your requirement -->
+					</rules>
+				  </check>
+				</configuration>
 			  </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
