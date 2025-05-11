@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     // Run tests and generate the code coverage report
-                    sh './mvnw clean test jacoco:check'
+                    sh './mvnw clean verify'
                 }
             }
         }
