@@ -13,16 +13,16 @@ pipeline {
         stage('Post Coverage Check') {
             steps {
                 script {
-                    def rawOutput = sh(
-                script: "grep -m1 -o '<td class=\"ctr2\">[0-9]\\+%</td>' target/site/jacoco/index.html",
-                returnStdout: true
-            ).trim()
-
-            // Extract just the number part from the HTML line
-            def coveragePercentage = rawOutput.replaceAll(/[^\d]/, '')  // Removes all non-digit characters
+                    def coveragePercentage = sh(
+                        script: '''
+                        grep -o '<td class="ctr2">[0-9]*%</td>' target/site/jacoco/index.html | \
+                        sed -E 's/.*>([0-9]+)%<.*/\\1/' | head -n 1
+                        ''',
+                        returnStdout: true
+                    ).trim()
 
                     echo "Code coverage: ${coveragePercentage}%"
-                    if (coveragePercentage.toInteger() < 90) {
+                    if (coveragePercentage.toFloat() < 90) {
                         error "Code coverage is below the 90% threshold!"
                     }
                 }
