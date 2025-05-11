@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.starwars.controller.SearchController;
 import com.example.starwars.service.SearchService;
 import com.example.starwars.service.KafkaProducer;
+import com.example.starwars.repository.KafkaStore;
 
 @WebMvcTest(controllers = SearchController.class)
 @Import(SecurityConfig.class)
@@ -22,12 +23,15 @@ public class SecurityConfigTest {
     @Autowired
     private MockMvc mockMvc;
 
-    // These beans are required by SearchController
+    // Mock the necessary beans
     @MockBean
     private SearchService searchService;
 
     @MockBean
     private KafkaProducer kafkaProducer;
+
+    @MockBean
+    private KafkaStore kafkaStore;  // Add this line to mock the KafkaStore bean
 
     @Test
     void shouldPermitAccessToSearchEndpointWithoutAuthentication() throws Exception {

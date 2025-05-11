@@ -4,6 +4,7 @@ import com.example.starwars.component.SearchResultModelAssembler;
 import com.example.starwars.component.StarWarsDataParser;
 import com.example.starwars.model.SearchResult;
 import com.example.starwars.service.OfflineDataService;
+import com.example.starwars.service.OnlineDataService;
 import com.example.starwars.service.StarWarsApiClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -20,7 +21,7 @@ import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class OnlineDataServiceImplTest {
+class OnlineDataServiceImplTest  {
 
     private StarWarsApiClient apiClient;
     private StarWarsDataParser parser;
@@ -48,37 +49,34 @@ class OnlineDataServiceImplTest {
         String type = "planets";
         String name = "Tatooine";
         String fullUrl = "https://swapi.dev/api/planets/?search=Tatooine";
-
-        // Mock root response
+    
         JsonNode rootNode = mock(JsonNode.class);
         JsonNode resultsNode = mock(ArrayNode.class);
         when(apiClient.fetch(fullUrl)).thenReturn(rootNode);
         when(rootNode.has("results")).thenReturn(true);
         when(rootNode.path("results")).thenReturn(resultsNode);
         when(resultsNode.isEmpty()).thenReturn(false);
-
-        // Mock parsed SearchResult
+    
         SearchResult parsedResult = new SearchResult(type, name, 1, Arrays.asList("https://swapi.dev/api/films/1/"));
         when(parser.parseResult(type, name, rootNode)).thenReturn(parsedResult);
-
-        // Mock film fetch and parsing
+    
         JsonNode filmNode = mock(ObjectNode.class);
         when(apiClient.fetch("https://swapi.dev/api/films/1/?format=json")).thenReturn(filmNode);
         when(parser.parseFilmTitle(filmNode)).thenReturn("A New Hope");
-
-        // Mock model assembler
+    
         parsedResult.setFilms(Arrays.asList("A New Hope"));
         EntityModel<SearchResult> expectedModel = EntityModel.of(parsedResult);
         when(modelAssembler.toModel(parsedResult)).thenReturn(expectedModel);
-
-        // Call method
+    
         EntityModel<SearchResult> result = onlineDataService.fetchData(type, name);
-
-        // Verify
+    
         assertNotNull(result);
         assertEquals(expectedModel, result);
-        verify(offlineDataService).updateData(type, name, parsedResult);
+        verify(modelAssembler).toModel(parsedResult);
+    
+        // Removed: verify(offlineDataService).updateData(type, name, parsedResult);
     }
+    
 
     @Test
     void fetchData_shouldReturnNoFilmModel_whenApiReturnsNoResults() {

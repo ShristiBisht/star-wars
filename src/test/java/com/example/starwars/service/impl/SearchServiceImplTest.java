@@ -1,16 +1,21 @@
-package com.example.starwars.service;
+package com.example.starwars.service.impl;
 
 import com.example.starwars.component.SearchResultModelAssembler;
 import com.example.starwars.model.SearchResult;
+import com.example.starwars.service.OfflineDataService;
+import com.example.starwars.service.OnlineDataService;
+import com.example.starwars.service.SearchService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.hateoas.EntityModel;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class SearchServiceTest {
+public class SearchServiceImplTest {
 
     @Mock
     private OnlineDataService onlineDataService;
@@ -22,8 +27,7 @@ public class SearchServiceTest {
     private SearchResultModelAssembler assembler;
 
     @InjectMocks
-    private SearchService searchService;
-
+    private SearchServiceImpl searchService;
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);

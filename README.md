@@ -176,3 +176,31 @@ This microservice applies several core object-oriented and architectural design 
 - **Benefit**: Loose coupling and non-blocking communication.
 
 ---
+
+## Sequence Diagram 
+![Sequence Diagram](sequenceDiag.png)
+
+---
+
+## **RUN BOOK**
+
+### **Steps to install jenkins**
+- **brew install jenkins-lts**
+- **brew install jenkins-lts**
+- **brew services start jenkins-lts --httpPort=8082**
+- **jenkins-lts --httpPort=8082**
+
+### **Jenkins Configuration**
+![Jenkins Config](jenkinsConfig.png)
+
+## Steps to run the application
+- docker-compose up --build
+- Post services are up: http://localhost:3000
+
+
+### else start backend and frontend explicitly
+- on root folder : mvn clean package
+
+### and then cd frontend dir, to start frontend explicitly and type 
+- npm run build
+- npm start

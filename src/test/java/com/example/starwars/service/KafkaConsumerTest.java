@@ -1,46 +1,51 @@
 package com.example.starwars.service;
 
 import com.example.starwars.model.SearchResult;
+import com.example.starwars.repository.KafkaStore;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.hateoas.EntityModel;
-
-import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 
 class KafkaConsumerTest {
 
     private KafkaConsumer kafkaConsumer;
-    private SearchService mockSearchService;
+    private SearchService searchService;
+    private KafkaStore kafkaStore;
 
     @BeforeEach
     void setUp() {
-        mockSearchService = mock(SearchService.class);
-        kafkaConsumer = new KafkaConsumer(mockSearchService);
+        searchService = mock(SearchService.class);
+        kafkaStore = mock(KafkaStore.class);
+        kafkaConsumer = new KafkaConsumer(searchService, kafkaStore);
     }
 
     @Test
     void consume_shouldCallSearchServiceWithValidMessage() {
         // given
-        String message = "people|Luke Skywalker";
+        String message = "people|Luke Skywalker|1234";
         SearchResult dummyResult = mock(SearchResult.class);
         EntityModel<SearchResult> dummyModel = EntityModel.of(dummyResult);
 
-        when(mockSearchService.search("people", "Luke Skywalker")).thenReturn(dummyModel);
+        when(searchService.search("people", "Luke Skywalker")).thenReturn(dummyModel);
 
         // when
         kafkaConsumer.consume(message);
 
         // then
-        verify(mockSearchService, times(1)).search("people", "Luke Skywalker");
+        verify(searchService, times(1)).search("people", "Luke Skywalker");
+        verify(kafkaStore, times(1)).update("1234", dummyModel);
     }
 
     @Test
     void consume_shouldNotCallSearchService_whenInvalidMessageFormat() {
+        // given: invalid message (only 1 part)
         kafkaConsumer.consume("invalid-message");
 
-        verify(mockSearchService, never()).search(anyString(), anyString());
+        // then
+        verify(searchService, never()).search(anyString(), anyString());
+        verify(kafkaStore, never()).update(anyString(), any());
     }
 }

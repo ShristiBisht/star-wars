@@ -1,31 +1,36 @@
 import axios from 'axios';
 
-export const fetchEntityData = async (type, name) => {
-  try {
-    const response = await axios.get('/api/search', {
-      params: { type, name },
-      withCredentials: true,
-    });
-    console.log("response is",response)
-    // Validate that the response is a proper object (optional, but useful)
-    if (typeof response.data !== 'object' || response.data === null) {
-      throw new Error('Invalid response: expected a JSON object.');
-    }
-     return { data: response.data };
-  } catch (error) {
-    // If it's an Axios error, log more details
-    if (error.response) {
-      console.error('Backend responded with error:', {
-        status: error.response.status,
-        data: error.response.data,
+
+/**
+ * Polls the backend until a response is available for the given requestId.
+ * @param {string} requestId - UUID returned by initiateSearch
+ * @returns {Promise<Object|null>} - The search result or null if timed out
+ */
+export const pollSearchResult = async (requestId) => {
+  const maxRetries = 20;
+  const delay = 1500; // 1.5 seconds
+  let attempts = 0;
+
+  while (attempts < maxRetries) {
+    try {
+      const response = await axios.get(`/api/result/${requestId}`, {
+        withCredentials: true,
       });
-    } else if (error.request) {
-      console.error('Request made but no response received:', error.request);
-    } else {
-      console.error('Error setting up the request:', error.message);
+
+      if (response.status === 200 && response.data) {
+        return response.data;
+      }
+    } catch (err) {
+      if (err.response?.status !== 404) {
+        console.error("Polling error:", err);
+        throw err;
+      }
     }
 
-    // Optionally: rethrow to handle it in the calling component
-    throw error;
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    attempts++;
   }
+
+  console.warn("Polling timed out.");
+  return null;
 };

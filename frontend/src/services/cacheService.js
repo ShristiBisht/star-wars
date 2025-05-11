@@ -10,6 +10,7 @@ export const getCachedData = (type, name) => {
   
   export const storeInCache = (type, name, data) => {
     try {
+      console.log("Data stored in cache",data.count)
       localStorage.setItem(`${type}-${name}`, JSON.stringify(data));
     } catch (e) {
       console.error("Error storing to cache", e);

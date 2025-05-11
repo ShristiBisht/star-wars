@@ -23,10 +23,11 @@ class KafkaProducerTest {
         // given
         String type = "people";
         String name = "Luke Skywalker";
-        String expectedMessage = "people|Luke Skywalker";
+        String requestID="abcd";
+        String expectedMessage = "people|Luke Skywalker|abcd";
 
         // when
-        kafkaProducer.sendSearchRequest(type, name);
+        kafkaProducer.sendSearchRequest(type, name,requestID);
 
         // then
         verify(kafkaTemplate, times(1)).send("search-requests", expectedMessage);

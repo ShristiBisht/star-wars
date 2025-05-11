@@ -1,6 +1,8 @@
+// Updated React SearchForm component based on 12-factor principles, SOLID, and HATEOAS integration
 import React, { useState } from 'react';
 import { getCachedData, storeInCache } from '../services/cacheService';
-import { fetchEntityData } from '../services/apiService';
+import { pollSearchResult } from '../services/apiService';
+import { initiateSearch } from '../services/initiateSearchService';
 
 const SearchForm = () => {
   const [type, setType] = useState('planets');
@@ -8,62 +10,46 @@ const SearchForm = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [offlineMode, setOfflineMode] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const types = ['planets', 'starships', 'vehicles', 'people', 'films', 'species'];
 
-  const toggleOfflineMode = () => {
-    setOfflineMode(!offlineMode);
-  };
-
-  // const getCachedData = (type, name) => {
-  //   const cachedData = localStorage.getItem(`${type}-${name}`);
-  //   return cachedData ? JSON.parse(cachedData) : null;
-  // };
-
-  const getCachedData = (type, name) => {
-    const cachedData = localStorage.getItem(`${type}-${name}`);
-    try {
-      return cachedData ? JSON.parse(cachedData) : null;
-    } catch (error) {
-      console.error("Failed to parse cached data:", error);
-      return null;
-    }
-  };
-  
-  const storeInLocalStorage = (type, name, data) => {
-    localStorage.setItem(`${type}-${name}`, JSON.stringify(data));
-  };
+  const toggleOfflineMode = () => setOfflineMode(!offlineMode);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const cachedData = getCachedData(type, name);
+
     if (offlineMode) {
       if (cachedData) {
         setResult(cachedData);
         setError(null);
       } else {
-        console.error("No data in cache");
         setError("Sorry, we couldn't find anything matching your search in offline mode.");
         setResult(null);
       }
       return;
     }
 
-    // Online mode
     try {
-      const response = await fetchEntityData(type, name);
-      setResult(response.data);
-      setError(null);
-      storeInLocalStorage(type, name, response.data);
-    } catch (err) {
-      console.error("Error fetching data:", err);
-      if (cachedData) {
-        setResult(cachedData);
-        setError("You're offline. Showing cached result.");
+      setLoading(true);
+      const { requestId } = await initiateSearch(type, name);
+
+      // Poll for result using requestId
+      const pollResult = await pollSearchResult(requestId);
+      if (pollResult && pollResult.count!=0) {
+        setResult(pollResult);
+        storeInCache(type, name, pollResult);
+        setError(null);
       } else {
         setResult(null);
-        setError("Sorry, we couldn't find anything matching your search.");
+        setError("No results found.");
       }
+    } catch (err) {
+      console.error("Search error:", err);
+      setError("An error occurred while fetching data.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,7 +84,9 @@ const SearchForm = () => {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">Search</button>
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? "Searching..." : "Search"}
+        </button>
       </form>
 
       <div className="offline-toggle mt-4">
