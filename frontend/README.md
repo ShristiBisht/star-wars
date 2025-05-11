@@ -1,70 +1,146 @@
-# Getting Started with Create React App
+# Frontend Design Patterns
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 1. SearchForm.jsx
 
-## Available Scripts
+### Design Patterns:
+- **Separation of Concerns**: UI logic is separated from caching (`cacheService`) and API (`apiService`) logic.
+- **Controlled Components**: React's `useState` is used to manage form inputs.
+- **Offline-First UX**: Supports offline searching via `localStorage`.
+- **Conditional Rendering**: Dynamically shows results or errors.
 
-In the project directory, you can run:
+### Implementation Highlights:
+- Uses `localStorage` for cache persistence.
+- Dynamically switches between offline and online modes.
+- Data is displayed immediately from cache if offline.
+- Tries live API and gracefully falls back to cached results if API fails.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 2. apiService.js
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Design Patterns:
+- **Service Abstraction**: Abstracts Axios calls into a service layer.
+- **Error Handling Strategy**: Differentiates between Axios response, request, and setup errors.
+- **Fail-Fast**: Validates response shape and throws errors early.
 
-### `npm test`
+### Implementation Highlights:
+- `fetchEntityData()` uses Axios with credentials.
+- Response is validated to be a proper object.
+- Logs detailed error contexts (status, request object, etc.).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 3. cacheService.js
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Design Patterns:
+- **Encapsulation**: Caching logic encapsulated into helper methods.
+- **Graceful Degradation**: Tries/catches for JSON parsing failures.
+- **Single Responsibility**: Keeps cache operations isolated from UI/API.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Implementation Highlights:
+- `getCachedData()` reads and parses JSON from `localStorage`.
+- `storeInCache()` stores serialized JSON data to `localStorage`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 4. SearchResults.jsx
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Design Patterns:
+- **Presentational Component**: Stateless and focused only on displaying data.
+- **Null Guarding**: Returns `null` when no results are passed to avoid rendering noise.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 5. serviceWorkerRegistration.js
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Design Patterns:
+- **Progressive Enhancement**: Registers service workers only in production.
+- **Separation of Concerns**: Encapsulates registration logic cleanly.
+- **Graceful Failure**: Catches and logs registration failures.
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Backend Design Patterns
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 1. SearchController.java
 
-### Code Splitting
+### Design Patterns:
+- **RESTful API**: Provides search and update endpoints.
+- **HATEOAS Compliance**: Wraps search results in `EntityModel<>`.
+- **Loose Coupling**: Delegates logic to `SearchService`, `KafkaProducer`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Implementation Highlights:
+- Kafka message produced on `/search`.
+- Updates and cache eviction exposed via dedicated endpoints.
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 2. SecurityConfig.java
 
-### Making a Progressive Web App
+### Design Patterns:
+- **Declarative Security Configuration**: Uses `SecurityFilterChain` for HTTP security setup.
+- **Open by Default**: Allows all endpoints for simplicity during development.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 3. AppConfig.java
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Design Patterns:
+- **Centralized Configuration**: Defines shared beans like `RestTemplate`.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 4. WebConfig.java
 
-### `npm run build` fails to minify
+### Design Patterns:
+- **CORS Configuration**: Enables cross-origin requests to support frontend-backend separation.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## 5. OnlineDataServiceImpl.java
+
+### Design Patterns:
+- **Strategy Pattern**: Decides between offline and online services.
+- **Resilience and Fallback**: Caches API data locally post-fetch.
+- **Single Responsibility**: Focused only on fetching, parsing, and updating cache.
+
+### Implementation Highlights:
+- Assembles HATEOAS-compliant response.
+- Converts film URLs into actual titles for readability.
+
+---
+
+## 6. OfflineDataServiceImpl.java
+
+### Design Patterns:
+- **In-Memory Caching**: Uses an in-memory store with Spring annotations.
+- **Decorator Pattern (Spring Caching)**: Adds cacheability and eviction with annotations.
+- **Logging & Observability**: Tracks cache hits and misses.
+
+---
+
+## 7. KafkaProducer / KafkaConsumer
+
+### Design Patterns:
+- **Event-Driven Architecture**: Decouples search request from processing using Kafka.
+- **Asynchronous Messaging**: Consumer listens to `search-requests` topic.
+- **Loose Coupling**: Kafka used to decouple user request from processing logic.
+
+---
+
+# Notable Design Concepts
+
+- **Offline First**: Supports offline data access using browser cache and in-memory backend cache.
+- **Microservice-Friendly**: Kafka integration enables distributed scaling.
+- **Observability**: Strategic logging added for request flows and failures.
+- **Resilience**: Handles fallbacks, caching, retries, and empty results gracefully.
+- **HATEOAS**: Backend response is wrapped for hypermedia-driven APIs.
+
+---
+
+# Testing Ideas
+
+- Simulate offline mode and observe fallback to cache.
+- Load multiple entity types to verify `SearchResult` displays them correctly.
+- Test search while backend is down to confirm error handling.
+- Test Kafka flow with a test consumer producing to `search-requests`.
