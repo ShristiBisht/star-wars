@@ -1,15 +1,6 @@
 pipeline {
     agent any
     stages {
-        stage('Start services') {
-            steps {
-                script {
-                    // This is where your docker-compose command goes
-                    sh 'docker-compose up -d --build'
-                }
-            }
-        }
-
         stage('Build and Test') {
             steps {
                 script {
@@ -37,7 +28,15 @@ pipeline {
                 }
             }
         }
-
+        stage('Start services') {
+            steps {
+                script {
+                    sh 'docker-compose down'
+                    // This is where your docker-compose command goes
+                    sh 'docker-compose up -d --build'
+                }
+            }
+        }
     }
 }
 
