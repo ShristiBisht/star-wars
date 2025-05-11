@@ -56,7 +56,6 @@ public class StarWarsApiClientImpl implements StarWarsApiClient {
         try {
             disableSslVerification();
             URL url = new URL(endpointUrl);
-            logger.info("URL is here"+url);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 

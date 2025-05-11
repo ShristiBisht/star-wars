@@ -46,10 +46,8 @@ public class OnlineDataServiceImpl implements OnlineDataService {
         if (rootNode == null || !rootNode.has("results") || rootNode.path("results").isEmpty()) {
             return modelAssembler.toModel(new SearchResult(type, name, "No Films Found"));
         }
-
         SearchResult result = parser.parseResult(type, name, rootNode);
-        logger.info("Filmy results "+result);
-        if(result.getName().equalsIgnoreCase(name) || (result.getType().equals("films") && result.getCount()==1)){
+        if(result.getName().equalsIgnoreCase(name)){
             List<String> filmTitles = new ArrayList<>();
             for (String filmUrl : result.getFilms()) {
                 JsonNode filmNode = starWarsApiClient.fetch(filmUrl + "?format=json");

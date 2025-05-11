@@ -1,6 +1,7 @@
 package com.example.starwars.component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -34,8 +35,8 @@ public class StarWarsDataParser {
         JsonNode firstResult = rootNode.path("results").get(0);
 
         // Use the utility methods to get the data
-        String entityName = getSafeText(firstResult, "name", "Unknown Entity");
-        List<String> filmUrls = getFilms(firstResult.path("films"));
+        String entityName = type.equalsIgnoreCase("films")?getSafeText(firstResult, "title", "Unknown Entity"):getSafeText(firstResult, "name", "Unknown Entity");
+        List<String> filmUrls = type.equalsIgnoreCase("films")?Collections.singletonList(entityName):getFilms(firstResult.path("films"));
 
         return new SearchResult(type, entityName, count, filmUrls);
     }
