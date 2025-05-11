@@ -14,42 +14,57 @@ import com.example.starwars.model.SearchResult;
 @Service
 public class SearchService {
 
-    private OnlineDataService onlineDataService;
-    private OfflineDataService offlineDataService;
-    private SearchResultModelAssembler assembler;
+    private  OnlineDataService onlineDataService;
+    private  OfflineDataService offlineDataService;
+    private  SearchResultModelAssembler assembler;
+
+    private static final Logger logger = Logger.getLogger(SearchService.class.getName());
 
     @Autowired
-    public SearchService(SearchResultModelAssembler assembler, OfflineDataService offlineDataService,OnlineDataService onlineDataService){
-        this.onlineDataService=onlineDataService;
-        this.offlineDataService=offlineDataService;
-        this.assembler=assembler;
+    public SearchService(SearchResultModelAssembler assembler,
+                         OfflineDataService offlineDataService,
+                         OnlineDataService onlineDataService) {
+        this.onlineDataService = onlineDataService;
+        this.offlineDataService = offlineDataService;
+        this.assembler = assembler;
     }
 
-
-    Logger logger = Logger.getLogger("SearchService");
-
     public EntityModel<SearchResult> search(String type, String name) {
-        SearchResult result;
-        if (type==null) {
-            logger.info("Offline mode is enabled");
-            result = offlineDataService.fetchData(type, name);
-        } else {
-            logger.info("Offline mode is disabled");
-            result = onlineDataService.fetchData(type, name).getContent();
-            logger.info("Result is "+result);
-            if (result == null) {
-                logger.info("Online fetch returned null, falling back to offline");
-                result = offlineDataService.fetchData(type, name);
-            }
-        }
+        SearchResult result = fetchDataWithFallback(type, name);
 
         if ("films".equalsIgnoreCase(type)) {
-
-        result.setName(name);
-        result.setFilms(Collections.singletonList(name));
+            enrichFilmResult(result, name);
         }
 
-        return assembler.toModel(result);  // wrap with HATEOAS EntityModel
+        return assembler.toModel(result);  // Separate responsibility of assembler
+    }
+
+    private SearchResult fetchDataWithFallback(String type, String name) {
+        /***
+         * in case you want backend OfflineService and cache
+         * boolean isOffline = (type == null);
+
+        if (isOffline) {
+            logger.info("Offline mode is enabled");
+            return offlineDataService.fetchData(type, name);
+        }
+
+        logger.info("Offline mode is disabled");
+        */
+        SearchResult onlineResult = onlineDataService.fetchData(type, name).getContent();
+
+        if (onlineResult == null )  {
+            logger.info("Online fetch returned null, falling back to offline");
+            return offlineDataService.fetchData(type, name);
+        }
+
+        logger.info("Online result: " + onlineResult);
+        return onlineResult;
+    }
+
+    private void enrichFilmResult(SearchResult result, String name) {
+        result.setName(name);
+        result.setFilms(Collections.singletonList(name));
     }
 
     @CacheEvict(value = "searchResults", key = "#type + '-' + #name")
