@@ -22,8 +22,8 @@ pipeline {
                     ).trim()
 
                     echo "Code coverage: ${coveragePercentage}%"
-                    if (coveragePercentage.toFloat() < 70) {
-                        error "Code coverage is below the 70% threshold!"
+                    if (coveragePercentage.toFloat() < 90) {
+                        error "Code coverage is below the 90% threshold!"
                     }
                 }
             }
