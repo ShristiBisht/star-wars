@@ -9,5 +9,29 @@ pipeline {
                 }
             }
         }
+
+        stage('Build and Test') {
+            steps {
+                script {
+                    // Run tests and generate the code coverage report
+                    sh './mvnw clean test jacoco:check'
+                }
+            }
+        }
+
+        stage('Post Coverage Check') {
+            steps {
+                script {
+                    // Parse the JaCoCo coverage report and fail if coverage is below 60%
+                    def coverageReport = readFile('target/site/jacoco/index.html')
+                    def coveragePercentage = sh(script: 'grep -oP "(?<=<span class=\\"percentage\\">)[^<]+" target/site/jacoco/index.html', returnStdout: true).trim()
+                    echo "Code coverage: ${coveragePercentage}%"
+                    if (coveragePercentage.toFloat() < 60) {
+                        error "Code coverage is below the 60% threshold!"
+                    }
+                }
+            }
+        }
     }
 }
+
