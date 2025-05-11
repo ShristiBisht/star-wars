@@ -11,14 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import com.example.starwars.component.SearchResultModelAssembler;
 import com.example.starwars.component.StarWarsDataParser;
 import com.example.starwars.model.SearchResult;
 import com.example.starwars.service.OfflineDataService;
 import com.example.starwars.service.OnlineDataService;
-import com.example.starwars.service.SearchService;
 import com.example.starwars.service.StarWarsApiClient;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -51,7 +49,7 @@ public class OnlineDataServiceImpl implements OnlineDataService {
 
         SearchResult result = parser.parseResult(type, name, rootNode);
         logger.info("Filmy results "+result);
-        if(result.getName().equals(name) || result.getType().equals("films")){
+        if(result.getName().equalsIgnoreCase(name) || result.getType().equals("films")){
             List<String> filmTitles = new ArrayList<>();
             for (String filmUrl : result.getFilms()) {
                 JsonNode filmNode = starWarsApiClient.fetch(filmUrl + "?format=json");
