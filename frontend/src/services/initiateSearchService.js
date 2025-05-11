@@ -1,3 +1,4 @@
+import axios from 'axios';
 
 /**
  * Initiates a Kafka-backed search by sending a request to the backend.
