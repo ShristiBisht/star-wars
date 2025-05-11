@@ -49,7 +49,7 @@ public class OnlineDataServiceImpl implements OnlineDataService {
 
         SearchResult result = parser.parseResult(type, name, rootNode);
         logger.info("Filmy results "+result);
-        if(result.getName().equalsIgnoreCase(name) || result.getType().equals("films")){
+        if(result.getName().equalsIgnoreCase(name) || (result.getType().equals("films") && result.getCount()==1)){
             List<String> filmTitles = new ArrayList<>();
             for (String filmUrl : result.getFilms()) {
                 JsonNode filmNode = starWarsApiClient.fetch(filmUrl + "?format=json");
