@@ -25,7 +25,10 @@ pipeline {
                     // Parse the JaCoCo coverage report and fail if coverage is below 60%
                     def coverageReport = readFile('target/site/jacoco/index.html')
                     def coveragePercentage = sh(
-                        script: 'grep "<span class=\\"percentage\\">" target/site/jacoco/index.html | sed -E \'s/.*<span class=\\"percentage\\">([^<]+)<.*/\\1/\'',
+                        script: '''
+                        grep -m1 -o '<td class="ctr2">[0-9]*%</td>' target/site/jacoco/index.html | \
+                        sed -E 's/.*>([0-9]+)%<.*/\\1/'
+                        ''',
                         returnStdout: true
                     ).trim()
                     echo "Code coverage: ${coveragePercentage}%"
