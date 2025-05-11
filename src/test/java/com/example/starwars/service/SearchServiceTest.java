@@ -55,6 +55,7 @@ public class SearchServiceTest {
         String name = "Empire Strikes Back";
 
         SearchResult mockResult = new SearchResult();
+        mockResult.setCount(1);
 
         when(onlineDataService.fetchData(type, name)).thenReturn(EntityModel.of(mockResult));
         when(assembler.toModel(mockResult)).thenReturn(EntityModel.of(mockResult));

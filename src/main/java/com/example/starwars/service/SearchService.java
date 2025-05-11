@@ -31,8 +31,8 @@ public class SearchService {
 
     public EntityModel<SearchResult> search(String type, String name) {
         SearchResult result = fetchDataWithFallback(type, name);
-
-        if ("films".equalsIgnoreCase(type)) {
+        logger.info("result is"+result);
+        if ("films".equalsIgnoreCase(type) && result.getCount()!=0) {
             enrichFilmResult(result, name);
         }
 
