@@ -22,15 +22,14 @@ pipeline {
         stage('Post Coverage Check') {
             steps {
                 script {
-                    // Parse the JaCoCo coverage report and fail if coverage is below 60%
-                    def coverageReport = readFile('target/site/jacoco/index.html')
                     def coveragePercentage = sh(
                         script: '''
-                        grep -m1 -o '<td class="ctr2">[0-9]*%</td>' target/site/jacoco/index.html | \
-                        sed -E 's/.*>([0-9]+)%<.*/\\1/'
+                        grep -o '<td class="ctr2">[0-9]*%</td>' target/site/jacoco/index.html | \
+                        sed -E 's/.*>([0-9]+)%<.*/\\1/' | head -n 1
                         ''',
                         returnStdout: true
                     ).trim()
+
                     echo "Code coverage: ${coveragePercentage}%"
                     if (coveragePercentage.toFloat() < 60) {
                         error "Code coverage is below the 60% threshold!"
@@ -38,6 +37,7 @@ pipeline {
                 }
             }
         }
+
     }
 }
 
