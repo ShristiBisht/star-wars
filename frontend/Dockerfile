@@ -11,6 +11,8 @@ RUN npm install
 # Copy the rest of your app’s source code
 COPY . .
 
+RUN npm test
+
 # Build the React app (production build)
 RUN npm run build
 
